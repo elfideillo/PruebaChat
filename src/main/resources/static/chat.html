@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Chat Prueba</title>
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
+</head>
+<body>
+  <h1>Chat en Tiempo Real</h1>
+  <div id="messages"></div>
+  <input type="text" id="messageInput" placeholder="Escribe tu mensaje...">
+  <button onclick="sendMessage()">Enviar</button>
+
+  <script>
+    let stompClient = null;
+
+    function connect() {
+      const socket = new SockJS('/chat');
+      stompClient = Stomp.over(socket);
+      stompClient.connect({}, function(frame) {
+        console.log("Conectado: " + frame);
+        stompClient.subscribe('/topic/messages', function(messageOutput) {
+          showMessage(messageOutput.body);
+        });
+      });
+    }
+
+    function sendMessage() {
+      const message = document.getElementById("messageInput").value;
+      if (stompClient && message) {
+        // Envía el mensaje al endpoint configurado en el servidor
+        stompClient.send("/app/sendMessage", {}, message);
+        document.getElementById("messageInput").value = "";
+      }
+    }
+
+    function showMessage(message) {
+      const messagesDiv = document.getElementById("messages");
+      const messageElement = document.createElement("p");
+      messageElement.textContent = message;
+      messagesDiv.appendChild(messageElement);
+    }
+
+    window.onload = connect;
+  </script>
+</body>
+</html>

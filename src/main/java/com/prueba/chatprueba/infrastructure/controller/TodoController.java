@@ -34,4 +34,9 @@ public class TodoController {
     public void delete(@PathVariable Long id) {
         todoUseCase.handleDelete(id);
     }
+
+    @PutMapping("/{id}")
+    public Todo update(@PathVariable Long id, @RequestBody Todo updatedTodo) {
+        return todoUseCase.handleUpdate(id, updatedTodo);
+    }
 }

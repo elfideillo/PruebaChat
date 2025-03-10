@@ -27,4 +27,20 @@ public class TodoUseCase {
     public void handleDelete(Long id) {
         todoService.deleteById(id);
     }
+
+    public Todo handleUpdate(Long id, Todo updatedTodo) {
+        // Primero, obtener la tarea existente.
+        Todo existingTodo = todoService.findById(id);
+        if(existingTodo == null) {
+            // Puedes lanzar una excepción o manejar el error según tu lógica
+            throw new RuntimeException("No se encontró el To-Do con id " + id);
+        }
+        // Actualiza los campos necesarios.
+        existingTodo.setDescription(updatedTodo.getDescription());
+        existingTodo.setCompleted(updatedTodo.isCompleted());
+        
+        // Guarda la tarea actualizada (con JPA, el método save actualiza si el ID ya existe)
+        return todoService.save(existingTodo);
+    }
+    
 }
